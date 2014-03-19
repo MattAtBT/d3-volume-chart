@@ -1,8 +1,6 @@
 {
   "name": "hcv",
   "private": true,
-  "dependencies": {
-    "d3": "~3.4.3"
-  },
+  "dependencies": {},
   "devDependencies": {}
 }
