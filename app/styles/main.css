@@ -22,8 +22,9 @@ svg {
 
 .line {
   fill: none;
-  stroke: grey;
-  stroke-width: 1.5px;
+  stroke: black;
+  stroke-width: 1px;
+  stroke-opacity: 0.5;
   clip-path: url(#clip);
 }
 
@@ -31,8 +32,13 @@ svg {
   fill: none;
   stroke: black;
   opacity: 0;
-  stroke-width: 12px;
+  stroke-width: 1.5px;
   clip-path: url(#clip);
+}
+
+.area-abs,
+.area-sd {
+	clip-path: url(#clip);
 }
 
 .select-line:hover {

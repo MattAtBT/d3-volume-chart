@@ -46,6 +46,18 @@ var line2 = d3.svg.line()
     .x(function(d) { return x2(d.time); })
     .y(function(d) { return y2(d.volume); });
 
+var areaAbs = d3.svg.area()
+    .interpolate("linear")
+    .x(function(d) { return x(d.time); })
+    .y0(function(d) { return y(d.abs_low); })
+    .y1(function(d) { return y(d.abs_high); });
+
+var areaSd2 = d3.svg.area()
+    .interpolate("linear")
+    .x(function(d) { return x(d.time); })
+    .y0(function(d) { return y(d.normal_low2_adj); })
+    .y1(function(d) { return y(d.normal_high2); });
+
 var manipulations = d3.select("body").append("div")
 	.attr("class", "manipulations");
 
@@ -68,12 +80,27 @@ var context = svg.append("g")
     .attr("class", "context")
     .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
-d3.csv("cvs.csv", type, function(error, data) {
+d3.csv("cvs_stats.csv", statsType, function(error, data) {
   x.domain(d3.extent(data.map(function(d) { return d.time; })));
-  y.domain([0, d3.max(data.map(function(d) { return d.volume; }))]);
+  y.domain([0, d3.max(data.map(function(d) { return d.abs_high; }))]);
   x2.domain(x.domain());
   y2.domain(y.domain());
 
+	focus.append("path")
+    .datum(data)
+    .style("fill", "#CCC")
+    .style("opacity", 0.25)
+    .attr("class", "area-abs")
+    .attr("d", areaAbs);
+
+	focus.append("path")
+    .datum(data)
+    .style("fill", "#666")
+		.attr("class", "area-sd")
+    .attr("d", areaSd2);
+
+
+d3.csv("cvs_top.csv", type, function(error, data) {
   color.domain(["Apple", "AirWatch", "BlackBerry", "Other"]);
 
   var ucObj = {};
@@ -127,7 +154,7 @@ d3.csv("cvs.csv", type, function(error, data) {
 			.attr("type", "checkbox")
 		.on("click", function() {
 			for(i = 0; i < color.domain().length; i++) {
-				d3.selectAll("[data-client-platform=" + color.domain()[i] + "]").style("stroke", this.checked ? color(color.domain()[i]) : "grey");
+				d3.selectAll("[data-client-platform=" + color.domain()[i] + "]").style("stroke", this.checked ? color(color.domain()[i]) : "black");
 			}
 		});
 
@@ -175,7 +202,7 @@ d3.csv("cvs.csv", type, function(error, data) {
   clients.forEach(function(c) {
     c.values = c.values.filter(function(n){ return n != undefined });
   });
-  
+
   var client = focus.selectAll(".client")
       .data(clients)
     .enter().append("g")
@@ -240,10 +267,17 @@ d3.csv("cvs.csv", type, function(error, data) {
       .attr("height", height2 + 7);
 });
 
+
+});
+
 function brushed() {
   x.domain(brush.empty() ? x2.domain() : brush.extent());
   focus.selectAll(".line").attr("d", function(col) {return line(col.values);});
   focus.selectAll(".select-line").attr("d", function(col) {return line(col.values);});
+
+  focus.selectAll(".area-abs").attr("d", function(col) {return areaAbs(col);});
+  focus.selectAll(".area-sd").attr("d", function(col) {return areaSd2(col);});
+
   focus.select(".x.axis").call(xAxis);
 }
 
@@ -270,6 +304,19 @@ function selectByBrush() {
 			}
 		}
 	}
+}
+
+function statsType(d) {
+	d.time = parseDate(d.for_time);
+	d.abs_high = +d.abs_high;
+	d.abs_low = +d.abs_low;
+	d.normal_low1 = +d.normal_low1;
+	d.normal_low1_adj = +d.normal_low1_adj;
+	d.normal_high1 = +d.normal_high1;
+	d.normal_low2 = +d.normal_low2;
+	d.normal_low2_adj = +d.normal_low2_adj;
+	d.normal_high2 = +d.normal_high2;
+	return d;
 }
 
 function type(d) {
