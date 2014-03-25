@@ -2,7 +2,7 @@ svg {
   font: 10px sans-serif;
 }
 
-.manipulations {
+.optionsArea {
 	display: inline-block;
 	width: 200px;
 }
@@ -36,9 +36,15 @@ svg {
   clip-path: url(#clip);
 }
 
-.area-abs,
+.area-abs {
+	clip-path: url(#clip);
+	fill: #CCC;
+	opacity: 0.25;
+}
+
 .area-sd {
 	clip-path: url(#clip);
+	fill: #555;
 }
 
 .select-line:hover {
@@ -50,4 +56,17 @@ svg {
   background-color: white;
   padding: 5px 20px;
   font-size: 10pt;
+	position: absolute;
+  z-index: 10;
+  visibility: hidden;
+}
+
+.drag-line {
+	stroke: red;
+	stroke-width: 5px;
+	stroke-dasharray: 5,5;
+}
+
+.drag-line:hover {
+	cursor: ns-resize;
 }
